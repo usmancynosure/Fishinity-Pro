@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-950: #05121a;
+  --color-ink-900: #071a24;
+  --color-ink-850: #0a2231;
+  --color-ink-800: #0e2a3c;
+  --color-ink-700: #14384f;
+  --color-ink-600: #1d4a66;
+
+  --color-surface: #0a1e2b;
+  --color-surface-2: #0e2838;
+  --color-line: #17384c;
+
+  --color-teal-300: #5eead4;
+  --color-teal-400: #2dd4bf;
+  --color-teal-500: #14b8a6;
+  --color-teal-600: #0d9488;
+
+  --color-coral-400: #fb8a5c;
+  --color-coral-500: #f97316;
+
+  --color-sky-300: #7dd3fc;
+  --color-sky-400: #38bdf8;
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---- Base: light (marketing/landing) ---- */
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: #ffffff;
+  color: #0f1e2e;
+  font-family: var(--font-body), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.font-display {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* ---- Dark theme, scoped to the app shell ---- */
+.app-dark {
+  color-scheme: dark;
+  color: #dceaf0;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(45, 212, 191, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 0% 0%, rgba(56, 189, 248, 0.06), transparent 55%),
+    var(--color-ink-950);
+}
+.app-dark * {
+  border-color: var(--color-line);
+}
+
+::selection {
+  background: rgba(45, 212, 191, 0.25);
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.app-dark ::-webkit-scrollbar-thumb {
+  background: #163647;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ---- Animations ---- */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(90deg, #0e2838 0%, #143547 50%, #0e2838 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite linear;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes driftUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-float,
+  .shimmer {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

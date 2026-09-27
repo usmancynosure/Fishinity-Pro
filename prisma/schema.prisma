@@ -1,0 +1,83 @@
+// Fishinity Pro — Feature Marketplace
+// SQL schema (SQLite for zero-setup local dev; swap the provider to postgres/mysql
+// for production — the models are portable).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Creator {
+  id        String    @id @default(cuid())
+  handle    String    @unique
+  name      String
+  avatar    String    @default("🎣")
+  bio       String    @default("")
+  createdAt DateTime  @default(now())
+  features  Feature[]
+}
+
+model Feature {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  category    String   @default("Other")
+  icon        String   @default("🎣")
+
+  // The generated/edited no-code definition, stored as JSON (SQL TEXT).
+  schema      String
+
+  status      String   @default("draft") // draft | published
+  visibility  String   @default("private") // private | public
+
+  // Monetization
+  pricingType String   @default("free") // free | oneoff | subscription
+  priceCents  Int      @default(0)
+
+  version     Int      @default(1)
+  views       Int      @default(0)
+  installs    Int      @default(0)
+
+  creator     Creator  @relation(fields: [creatorId], references: [id])
+  creatorId   String
+
+  reviews     Review[]
+  versions    FeatureVersion[]
+  events      Event[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+}
+
+model FeatureVersion {
+  id        String   @id @default(cuid())
+  feature   Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  featureId String
+  version   Int
+  schema    String
+  note      String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  feature   Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  featureId String
+  author    String
+  rating    Int
+  comment   String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id        String   @id @default(cuid())
+  feature   Feature  @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  featureId String
+  type      String // view | install | run | ai_run
+  createdAt DateTime @default(now())
+}
