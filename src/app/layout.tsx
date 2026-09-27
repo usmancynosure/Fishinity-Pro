@@ -10,6 +10,7 @@ const display = Plus_Jakarta_Sans({
 const body = Inter({ subsets: ["latin"], variable: "--font-body" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"),
   title: "Fishinity Pro — Build fishing tools with AI",
   description:
     "The Fishinity Pro Feature Builder turns a plain-English description into a working, no-code fishing tool. Customise it visually, then publish it to the marketplace — free or paid.",

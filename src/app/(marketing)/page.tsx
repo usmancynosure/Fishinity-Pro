@@ -4,6 +4,8 @@ import { serializeFeature, priceLabel } from "@/lib/features";
 import { Nav } from "@/components/landing/Nav";
 import { Faq } from "@/components/landing/Faq";
 import { Testimonials } from "@/components/landing/Testimonials";
+import { FeatureCarousel } from "@/components/landing/FeatureCarousel";
+import { SiteFooter } from "@/components/landing/SiteFooter";
 import { AppImage } from "@/components/AppImage";
 
 export const dynamic = "force-dynamic";
@@ -99,6 +101,17 @@ const FEATURE_CARDS = [
   },
 ];
 
+const COMMUNITY = [
+  { label: "Anglers", icon: "🎣", grad: "from-teal-500 to-cyan-500" },
+  { label: "Coaches", icon: "🏆", grad: "from-sky-500 to-blue-500" },
+  { label: "Waterbody owners", icon: "💧", grad: "from-cyan-500 to-teal-500" },
+  { label: "Fishing brands", icon: "🏷️", grad: "from-emerald-500 to-teal-500" },
+  { label: "Influencers", icon: "📣", grad: "from-sky-500 to-indigo-500" },
+  { label: "Match organisers", icon: "🥇", grad: "from-teal-500 to-emerald-500" },
+  { label: "Charter captains", icon: "⚓", grad: "from-blue-500 to-cyan-500" },
+  { label: "Tackle shops", icon: "🪝", grad: "from-cyan-600 to-sky-500" },
+];
+
 /* ---------- page ---------- */
 
 export default async function Landing() {
@@ -109,12 +122,25 @@ export default async function Landing() {
     prisma.feature.findMany({
       where: { status: "published", visibility: "public" },
       orderBy: { installs: "desc" },
-      take: 4,
+      take: 8,
       include: { creator: true, reviews: { select: { rating: true } } },
     }),
   ]);
   const installs = agg._sum.installs ?? 0;
   const featured = featuredRows.map(serializeFeature);
+  const carouselItems = featured.map((f) => ({
+    id: f.id,
+    icon: f.icon,
+    name: f.name,
+    description: f.description,
+    creatorName: f.creator?.name ?? "Unknown",
+    creatorAvatar: f.creator?.avatar ?? "🎣",
+    installs: f.installs,
+    price: priceLabel(f.pricingType, f.priceCents),
+    category: f.category,
+    rating: f.rating,
+    reviewCount: f.reviewCount,
+  }));
 
   return (
     <div className="bg-white text-slate-900 overflow-x-hidden">
@@ -129,7 +155,7 @@ export default async function Landing() {
 
         <div className="relative">
           <Nav />
-          <div className="mx-auto max-w-6xl px-4 pt-14 md:pt-20 pb-8 text-center">
+          <div className="mx-auto max-w-7xl px-4 pt-14 md:pt-20 pb-8 text-center">
             <div className="flex justify-center animate-fade-up">
               <Pill>
                 <span className="rounded-full bg-teal-500 px-1.5 text-[10px] font-bold text-white">NEW</span>
@@ -161,7 +187,7 @@ export default async function Landing() {
           </div>
 
           {/* hero product shot */}
-          <div className="mx-auto max-w-5xl px-4 pb-16 md:pb-24">
+          <div className="mx-auto max-w-6xl px-4 pb-16 md:pb-24">
             <div className="relative animate-fade-up">
               <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-tr from-teal-200/40 to-sky-200/40 blur-2xl" />
               <AppImage
@@ -187,27 +213,32 @@ export default async function Landing() {
         </div>
       </section>
 
-      {/* ============ TRUST STRIP ============ */}
-      <section className="border-y border-slate-100 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-8">
-          <p className="text-center text-xs font-medium uppercase tracking-widest text-slate-400">
-            Built for the whole fishing community
-          </p>
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm font-semibold text-slate-500">
-            {["Anglers", "Coaches", "Waterbody owners", "Fishing brands", "Influencers", "Match organisers"].map(
-              (x) => (
-                <span key={x} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-teal-400" />
-                  {x}
-                </span>
-              )
-            )}
+      {/* ============ TRUST STRIP (gradient marquee) ============ */}
+      <section className="overflow-hidden border-y border-slate-100 bg-white py-9">
+        <p className="text-center text-xs font-semibold uppercase tracking-widest text-slate-400">
+          Built for the whole fishing community
+        </p>
+        <div className="marquee-mask mt-6 overflow-hidden">
+          <div className="flex w-max animate-marquee">
+            {[0, 1].map((group) => (
+              <div key={group} className="flex shrink-0 gap-3.5 pr-3.5" aria-hidden={group === 1}>
+                {COMMUNITY.map((r) => (
+                  <span
+                    key={r.label}
+                    className={`inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r ${r.grad} animate-gradient px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-slate-900/5`}
+                  >
+                    <span className="text-base">{r.icon}</span>
+                    {r.label}
+                  </span>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ============ FEATURES ============ */}
-      <section id="features" className="mx-auto max-w-6xl px-4 py-20 md:py-28">
+      <section id="features" className="mx-auto max-w-7xl px-4 py-20 md:py-28">
         <div className="mx-auto max-w-2xl text-center">
           <SectionLabel>The builder</SectionLabel>
           <h2 className="mt-3 font-display text-3xl font-bold text-slate-900 sm:text-4xl">
@@ -247,7 +278,7 @@ export default async function Landing() {
 
       {/* ============ HOW IT WORKS ============ */}
       <section id="how" className="bg-slate-50 border-y border-slate-100">
-        <div className="mx-auto max-w-6xl px-4 py-20 md:py-24">
+        <div className="mx-auto max-w-7xl px-4 py-20 md:py-24">
           <div className="mx-auto max-w-2xl text-center">
             <SectionLabel>How it works</SectionLabel>
             <h2 className="mt-3 font-display text-3xl font-bold text-slate-900 sm:text-4xl">
@@ -272,7 +303,7 @@ export default async function Landing() {
       </section>
 
       {/* ============ DATA ENGINE ============ */}
-      <section className="mx-auto max-w-6xl px-4 py-20 md:py-28">
+      <section className="mx-auto max-w-7xl px-4 py-20 md:py-28">
         <div className="grid items-center gap-12 lg:grid-cols-2">
           <div>
             <SectionLabel>Fishinity data engine</SectionLabel>
@@ -337,52 +368,33 @@ export default async function Landing() {
       {/* ============ MARKETPLACE PREVIEW ============ */}
       {featured.length > 0 && (
         <section className="bg-slate-50 border-y border-slate-100">
-          <div className="mx-auto max-w-6xl px-4 py-20 md:py-24">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <SectionLabel>Marketplace</SectionLabel>
-                <h2 className="mt-3 font-display text-3xl font-bold text-slate-900 sm:text-4xl">
-                  Trending fishing tools
-                </h2>
-              </div>
-              <Link href="/marketplace" className="text-sm font-semibold text-teal-600 hover:text-teal-700">
-                Browse all →
-              </Link>
+          <div className="mx-auto max-w-7xl px-4 py-20 md:py-24">
+            <div className="mx-auto max-w-2xl text-center">
+              <SectionLabel>Marketplace</SectionLabel>
+              <h2 className="mt-3 font-display text-3xl font-bold text-slate-900 sm:text-4xl">
+                Trending fishing tools
+              </h2>
+              <p className="mt-4 text-slate-600">
+                Real tools built and published by the community — free and paid.
+              </p>
             </div>
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {featured.map((f) => (
-                <Link
-                  key={f.id}
-                  href={`/feature/${f.id}`}
-                  className="group flex flex-col rounded-2xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg"
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="grid h-11 w-11 place-items-center rounded-xl bg-slate-100 text-2xl">{f.icon}</span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        priceLabel(f.pricingType, f.priceCents) === "Free"
-                          ? "bg-teal-100 text-teal-700"
-                          : "bg-orange-100 text-orange-700"
-                      }`}
-                    >
-                      {priceLabel(f.pricingType, f.priceCents)}
-                    </span>
-                  </div>
-                  <div className="mt-3 font-display font-bold text-slate-900 group-hover:text-teal-700">{f.name}</div>
-                  <div className="mt-1 line-clamp-2 flex-1 text-sm text-slate-500">{f.description}</div>
-                  <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500">
-                    <span>{f.creator?.avatar} {f.creator?.name}</span>
-                    <span>{f.installs} installs</span>
-                  </div>
-                </Link>
-              ))}
+            <div className="mt-12">
+              <FeatureCarousel items={carouselItems} />
+            </div>
+            <div className="mt-4 text-center">
+              <Link
+                href="/marketplace"
+                className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+              >
+                Browse all features <span aria-hidden>→</span>
+              </Link>
             </div>
           </div>
         </section>
       )}
 
       {/* ============ TESTIMONIALS ============ */}
-      <section className="mx-auto max-w-6xl px-4 py-20 md:py-28">
+      <section className="mx-auto max-w-7xl px-4 py-20 md:py-28">
         <div className="mx-auto max-w-2xl text-center">
           <SectionLabel>Loved by anglers</SectionLabel>
           <h2 className="mt-3 font-display text-3xl font-bold text-slate-900 sm:text-4xl">
@@ -396,7 +408,7 @@ export default async function Landing() {
 
       {/* ============ PRICING / MONETISE ============ */}
       <section id="pricing" className="bg-slate-50 border-y border-slate-100">
-        <div className="mx-auto max-w-6xl px-4 py-20 md:py-24">
+        <div className="mx-auto max-w-7xl px-4 py-20 md:py-24">
           <div className="mx-auto max-w-2xl text-center">
             <SectionLabel>Monetise</SectionLabel>
             <h2 className="mt-3 font-display text-3xl font-bold text-slate-900 sm:text-4xl">
@@ -441,7 +453,7 @@ export default async function Landing() {
       </section>
 
       {/* ============ FAQ ============ */}
-      <section id="faq" className="mx-auto max-w-6xl px-4 py-20 md:py-28">
+      <section id="faq" className="mx-auto max-w-7xl px-4 py-20 md:py-28">
         <div className="mx-auto max-w-2xl text-center">
           <SectionLabel>FAQ</SectionLabel>
           <h2 className="mt-3 font-display text-3xl font-bold text-slate-900 sm:text-4xl">Questions, answered</h2>
@@ -452,7 +464,7 @@ export default async function Landing() {
       </section>
 
       {/* ============ FINAL CTA ============ */}
-      <section className="mx-auto max-w-6xl px-4 pb-24">
+      <section className="mx-auto max-w-7xl px-4 pb-24">
         <div className="relative overflow-hidden rounded-[2rem] bg-slate-900 px-6 py-16 text-center md:py-20">
           <div className="absolute -right-20 -top-20 text-[240px] opacity-10 select-none">🐟</div>
           <div className="absolute inset-0 bg-gradient-to-tr from-teal-500/20 to-sky-500/10" />
@@ -483,53 +495,7 @@ export default async function Landing() {
       </section>
 
       {/* ============ FOOTER ============ */}
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-12">
-          <div className="flex flex-col items-start justify-between gap-8 md:flex-row">
-            <div className="max-w-xs">
-              <div className="flex items-center gap-2.5">
-                <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-teal-500 to-sky-500 text-white">
-                  🎣
-                </span>
-                <span className="font-display font-bold text-slate-900">Fishinity Pro</span>
-              </div>
-              <p className="mt-3 text-sm text-slate-500">
-                The AI-powered no-code Feature Builder and marketplace for the fishing community.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-10 sm:grid-cols-3">
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">Product</div>
-                <ul className="mt-3 space-y-2 text-sm text-slate-600">
-                  <li><Link href="/builder" className="hover:text-slate-900">AI Builder</Link></li>
-                  <li><Link href="/marketplace" className="hover:text-slate-900">Marketplace</Link></li>
-                  <li><Link href="/dashboard" className="hover:text-slate-900">Creator Dashboard</Link></li>
-                </ul>
-              </div>
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">Learn</div>
-                <ul className="mt-3 space-y-2 text-sm text-slate-600">
-                  <li><a href="#how" className="hover:text-slate-900">How it works</a></li>
-                  <li><a href="#pricing" className="hover:text-slate-900">Pricing</a></li>
-                  <li><a href="#faq" className="hover:text-slate-900">FAQ</a></li>
-                </ul>
-              </div>
-              <div>
-                <div className="text-xs font-semibold uppercase tracking-widest text-slate-400">Creators</div>
-                <ul className="mt-3 space-y-2 text-sm text-slate-600">
-                  <li>Anglers</li>
-                  <li>Waterbody owners</li>
-                  <li>Brands & coaches</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-          <div className="mt-10 flex flex-col items-center justify-between gap-2 border-t border-slate-100 pt-6 text-xs text-slate-400 sm:flex-row">
-            <span>Fishinity Pro · Special Fishinity Pro Module — Feature Marketplace demo</span>
-            <span>Next.js · Node · SQL (Prisma) · Google Gemini</span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
