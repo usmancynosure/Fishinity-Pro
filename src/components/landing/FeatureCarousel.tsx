@@ -72,7 +72,7 @@ export function FeatureCarousel({ items }: { items: CarouselItem[] }) {
           return (
             <div
               key={item.id}
-              className="absolute left-1/2 top-2 w-[300px] sm:w-[340px] transition-all duration-500 ease-out"
+              className="absolute left-1/2 top-2 w-[85vw] max-w-[340px] sm:w-[340px] transition-all duration-500 ease-out"
               style={style}
               onClick={() => !isCenter && setIndex(i)}
               aria-hidden={!isCenter}

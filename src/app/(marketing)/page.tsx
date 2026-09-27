@@ -248,7 +248,7 @@ export default async function Landing() {
             From a plain-English idea to a published, revenue-earning product — without writing a line of code.
           </p>
         </div>
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {FEATURE_CARDS.map((c) => (
             <div key={c.title} className="rounded-3xl border border-slate-200 bg-white p-2 shadow-sm">
               <div className={`rounded-2xl bg-gradient-to-b ${c.grad} p-4`}>{c.mock}</div>
@@ -285,7 +285,7 @@ export default async function Landing() {
               From idea to published in four steps
             </h2>
           </div>
-          <div className="mt-12 grid gap-5 md:grid-cols-4">
+          <div className="mt-12 grid gap-5 sm:grid-cols-2 md:grid-cols-4">
             {[
               { n: "01", t: "Describe", b: "Tell the AI what fishing tool you want in plain English." },
               { n: "02", t: "Generate", b: "AI produces a working first version instantly." },
